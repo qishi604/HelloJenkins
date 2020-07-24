@@ -7,7 +7,7 @@ __dst_dir = 'apks/'
 
 
 def ensure_dirs():
-    if os.path.exists(__dst_dir):
+    if not os.path.exists(__dst_dir):
         os.mkdir(__dst_dir)
 
 
