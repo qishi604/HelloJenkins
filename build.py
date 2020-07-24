@@ -47,8 +47,7 @@ def gen_qr_code(url, dst):
 
 
 def build():
-    # cmd = r'assembleDebug'
-    cmd = r'dir'
+    cmd = r'gradle clean assembleDebug'
     r = os.system(cmd)
     print('command result')
     print(r)
@@ -65,5 +64,4 @@ def build():
 
 
 if __name__ == '__main__':
-    # build()
-    move_apks()
+    build()
