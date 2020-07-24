@@ -4,19 +4,11 @@ import shutil
 
 __src_dir = 'app/build/outputs/apk/'
 __dst_dir = 'apks/'
-__qrcode_dir = 'qrcode/'
 
 
-def move_apks():
-    src_dir = __src_dir
-    dst_dir = __dst_dir
-    if os.path.exists(src_dir):
-        for f in os.listdir(src_dir):
-            shutil.move(f, dst_dir)
-            print('move {0} to {1}', f, dst_dir)
-        print('move apks end!')
-    else:
-        print('{0} not exist'.format(src_dir))
+def ensure_dirs():
+    if os.path.exists(__dst_dir):
+        os.mkdir(__dst_dir)
 
 
 def find_apks(result, dir=__dst_dir):
@@ -28,10 +20,23 @@ def find_apks(result, dir=__dst_dir):
     :return:
     """
     for f in os.listdir(dir):
-        if os.path.isdir(dir):
-            find_apks(result, f)
+        apk_file = dir + os.sep + f
+        if os.path.isdir(apk_file):
+            find_apks(result, apk_file)
         elif f.endswith('.apk'):
-            result.append(f)
+            result.append(apk_file)
+
+
+def move_apks(apk_list):
+    """
+    将 apk 移动到指定位置
+
+    :param apk_list:
+    :return:
+    """
+    if len(apk_list) > 0:
+        for apk in apk_list:
+            shutil.move(apk, __dst_dir)
 
 
 def gen_qr_code(url, dst):
@@ -47,19 +52,21 @@ def gen_qr_code(url, dst):
 
 
 def build():
-    cmd = r'gradle clean assembleDebug'
+    cmd = r'gradlew clean assembleDebug'
     r = os.system(cmd)
-    print('command result')
-    print(r)
+    print('command result {0}', r)
     if r == 0:
         print('build success!')
-        move_apks()
+        ensure_dirs()
+        apks_list = []
+        find_apks(apks_list, __src_dir)
+        move_apks(apks_list)
         apks_list = []
         find_apks(apks_list)
         print(apks_list)
 
         for f in apks_list:
-            dst_name = '{0}{1}.png'.format(__dst_dir, f[:-4])
+            dst_name = '{0}.png'.format(f[:-4])
             gen_qr_code(f, dst_name)
 
 
