@@ -22,7 +22,7 @@ def find_apks(result, dir=__dst_dir):
     :return:
     """
     for f in os.listdir(dir):
-        apk_file = dir + os.sep + f
+        apk_file = os.path.join(dir, f)
         if os.path.isdir(apk_file):
             find_apks(result, apk_file)
         elif f.endswith('.apk'):
@@ -62,13 +62,13 @@ def build(args):
         ensure_dirs()
         apks_list = []
         find_apks(apks_list, __src_dir)
-        # move_apks(apks_list)
-        # apks_list = []
-        # find_apks(apks_list)
+        move_apks(apks_list)
+        apks_list = []
+        find_apks(apks_list)
         print(apks_list)
 
         # jenkins job url
-        print('jenkins job url: ' + args[0])
+        print('jenkins job url: ' + args)
 
         for f in apks_list:
             dst_name = '{0}.png'.format(f[:-4])
