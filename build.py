@@ -7,8 +7,9 @@ __dst_dir = 'apks/'
 
 
 def ensure_dirs():
-    if not os.path.exists(__dst_dir):
-        os.mkdir(__dst_dir)
+    if os.path.exists(__dst_dir):
+        return    
+    os.mkdir(__dst_dir)
 
 
 def find_apks(result, dir=__dst_dir):
@@ -56,14 +57,17 @@ def build():
     r = os.system(cmd)
     print('command result {0}', r)
     if r == 0:
-        print('build success!')
+        print('================= gradle build success! =======================')
         ensure_dirs()
         apks_list = []
         find_apks(apks_list, __src_dir)
-        move_apks(apks_list)
-        apks_list = []
-        find_apks(apks_list)
+        # move_apks(apks_list)
+        # apks_list = []
+        # find_apks(apks_list)
         print(apks_list)
+
+        # jenkins job url
+        print('jenkins job url: ' + JOB_URL)
 
         for f in apks_list:
             dst_name = '{0}.png'.format(f[:-4])
