@@ -1,5 +1,6 @@
 import qrcode
 import os
+import sys
 import shutil
 
 __src_dir = 'app/build/outputs/apk/'
@@ -52,7 +53,7 @@ def gen_qr_code(url, dst):
     img.save(dst)
 
 
-def build():
+def build(args):
     cmd = r'gradlew clean assembleDebug'
     r = os.system(cmd)
     print('command result {0}', r)
@@ -67,7 +68,7 @@ def build():
         print(apks_list)
 
         # jenkins job url
-        print('jenkins job url: ' + JOB_URL)
+        print('jenkins job url: ' + args[0])
 
         for f in apks_list:
             dst_name = '{0}.png'.format(f[:-4])
@@ -75,4 +76,4 @@ def build():
 
 
 if __name__ == '__main__':
-    build()
+    build(sys.argv)
