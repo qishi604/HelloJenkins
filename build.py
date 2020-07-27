@@ -68,7 +68,8 @@ def build(args):
         print(apks_list)
 
         # jenkins job url
-        print('jenkins job url: ' + args)
+        print('jenkins job url: ')
+        print(args)
 
         for f in apks_list:
             dst_name = '{0}.png'.format(f[:-4])
