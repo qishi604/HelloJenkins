@@ -224,13 +224,13 @@ def send_normal_msg(job_url, job_num, user, apk_list):
     :param apk_list:
     :return:
     """
-    content = '<@{0}> **{0} 打包成功**\n'.format(user, job_num)  # 消息内容
+    content = r'<@{0}> **{0} 打包成功**\n'.format(user, job_num)  # 消息内容
 
     for f in apk_list:
         apk_url = job_url + f  # apk url
 
         # 构造一个消息
-        content += '[{0}]({0}) \n'.format(apk_url)
+        content += r'[{0}]({0}) \n'.format(apk_url)
 
     user = [user]
 
