@@ -237,7 +237,7 @@ def send_normal_msg(job_url, job_num, user, apk_list):
     # 发送消息
     print('================== 开始发送消息 =========================')
 
-    send_text_msg(content, user)
+    send_markdown(content, user)
 
 
 def send_qr_code_msg(apk_list):
