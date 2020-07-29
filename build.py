@@ -185,7 +185,7 @@ def build(args):
         print('args: ')
         print(args)
 
-        send_normal_msg(apk_list)
+        send_normal_msg(job_url, job_num, user, apk_list)
 
     else:
         # 发送失败消息
