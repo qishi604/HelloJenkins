@@ -14,7 +14,7 @@ import requests
 __hook_url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=9d8617dd-444d-41a0-9851-d96dec337677'
 
 
-def build_text_msg(content):
+def build_text_msg(text):
     '''
     构造文本消息
     {
@@ -26,14 +26,12 @@ def build_text_msg(content):
         }
     }
 
-    :param content: 文本内容，2048字节内，utf-8 编码
+    :param text: {content,mentioned_list}
     :return: 文本消息 dict
     '''
     return {
         'msgtype': 'text',
-        'text': {
-            'content': content
-        }
+        'text': text
     }
 
 
@@ -71,14 +69,21 @@ def build_new_msg(articles):
     }
 
 
-def send_text_msg(content):
-    '''
+def send_text_msg(content, mentioned_list=None):
+    """
     发送文本下消息
 
+    :param mentioned_list:
     :param content:
     :return:
-    '''
-    send_msg(build_text_msg(content))
+    """
+    if mentioned_list is None:
+        mentioned_list = ['@all']
+    text = {
+        'content': content,
+        'mentioned_list': mentioned_list
+    }
+    send_msg(build_text_msg(text))
 
 
 def send_news_msg(content):
@@ -167,6 +172,7 @@ def build(args):
 
     job_url = args[1]  # jenkins job url
     job_num = args[2]  # jenkins job num
+    user = args[3]  # jenkins build user
 
     if r == 0:
         print('================= gradle build success! =======================')
@@ -179,31 +185,68 @@ def build(args):
         print('args: ')
         print(args)
 
-        articles = []  # 消息列表
-
-        for f in apk_list:
-            pic_path = '{0}.png'.format(f[:-4])  # 二维码保存路径
-            apk_url = job_url + f  # apk url
-            gen_qr_code(apk_url, pic_path)  # 生成二维码
-            pic_url = job_url + pic_path  # 图片 url
-
-            # 构造一个消息
-            d = {
-                'title': job_num,
-                'description': '打包成功',
-                'url': apk_url,
-                'picurl': pic_url
-            }
-            articles.append(d)
-
-        # 发送消息
-        print('================== 开始发送消息 =========================')
-        send_news_msg(articles)
+        send_normal_msg(apk_list)
 
     else:
         # 发送失败消息
         msg = '{0} 打包失败'.format(job_num)
-        send_text_msg(msg)
+        send_text_msg(msg, user)
+
+
+def send_normal_msg(job_url, job_num, user, apk_list):
+    """
+    发送普通文本消息
+
+    :param user:
+    :param job_num:
+    :param job_url:
+    :param apk_list:
+    :return:
+    """
+    content = '{0} 打包成功\n'.format(job_num)  # 消息内容
+
+    for f in apk_list:
+        apk_url = job_url + f  # apk url
+
+        # 构造一个消息
+        content += apk_url + '\n'
+
+    user = [user]
+
+    # 发送消息
+    print('================== 开始发送消息 =========================')
+
+    send_text_msg(content, user)
+
+
+def send_qr_code_msg(apk_list):
+    """
+    发送二维码消息
+
+    :param apk_list:
+    :return:
+    """
+
+    articles = []  # 消息列表
+
+    for f in apk_list:
+        pic_path = '{0}.png'.format(f[:-4])  # 二维码保存路径
+        apk_url = job_url + f  # apk url
+        gen_qr_code(apk_url, pic_path)  # 生成二维码
+        pic_url = job_url + pic_path  # 图片 url
+
+        # 构造一个消息
+        d = {
+            'title': job_num,
+            'description': '打包成功',
+            'url': apk_url,
+            'picurl': pic_url
+        }
+        articles.append(d)
+
+    # 发送消息
+    print('================== 开始发送消息 =========================')
+    send_news_msg(articles)
 
 
 if __name__ == '__main__':
