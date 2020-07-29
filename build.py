@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import qrcode
 import os
 import sys
@@ -96,7 +98,9 @@ def send_text_msg(content, mentioned_list=None):
 def send_markdown(content):
     msg = {
         'msgtype': 'markdown',
-        'markdown': content
+        'markdown': {
+            content: content
+        }
     }
     send_msg(msg)
 
@@ -231,8 +235,6 @@ def send_normal_msg(job_url, job_num, user, apk_list):
 
         # 构造一个消息
         content += '[{0}]({0}) \n'.format(apk_url)
-
-    user = [user]
 
     # 发送消息
     print('================== 开始发送消息 =========================')
