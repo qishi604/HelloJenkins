@@ -79,30 +79,51 @@ def send_text_msg(content, mentioned_list=None):
     """
     if mentioned_list is None:
         mentioned_list = ['@all']
+
     text = {
         'content': content,
         'mentioned_list': mentioned_list
     }
-    send_msg(build_text_msg(text))
+
+    msg = {
+        'msgtype': 'text',
+        'text': text
+    }
+
+    send_msg(msg)
+
+
+def send_markdown(content):
+    msg = {
+        'msgtype': 'markdown',
+        'markdown': content
+    }
+    send_msg(msg)
 
 
 def send_news_msg(content):
-    '''
+    """
     发送图文消息
 
     :param content:
     :return:
-    '''
-    send_msg(build_new_msg(content))
+    """
+    msg = {
+        'msgtype': 'news',
+        'news': {
+            'articles': content
+        }
+    }
+    send_msg(msg)
 
 
 def send_msg(msg):
-    '''
+    """
     发送消息
 
-    :param content:
+    :param msg:
     :return:
-    '''
+    """
     headers = {
         'user-agent': 'jenkins'
     }
@@ -126,13 +147,13 @@ def ensure_dirs():
 
 
 def find_apks(result, dir=__dst_dir):
-    '''
+    """
     find apk from dir
 
     :param result: 数组
     :param dir:
     :return:
-    '''
+    """
     for f in os.listdir(dir):
         apk_file = os.path.join(dir, f)
         if os.path.isdir(apk_file):
@@ -142,25 +163,25 @@ def find_apks(result, dir=__dst_dir):
 
 
 def move_apks(apk_list):
-    '''
+    """
     将 apk 移动到指定位置
 
     :param apk_list:
     :return:
-    '''
+    """
     if len(apk_list) > 0:
         for apk in apk_list:
             shutil.move(apk, __dst_dir)
 
 
 def gen_qr_code(url, dst):
-    '''
+    """
     使用 url 生成二维码
 
     :param url:
     :param dst: 二维码保存路径
     :return:
-    '''
+    """
     img = qrcode.make(url)
     img.save(dst)
 
@@ -203,13 +224,13 @@ def send_normal_msg(job_url, job_num, user, apk_list):
     :param apk_list:
     :return:
     """
-    content = '{0} 打包成功\n'.format(job_num)  # 消息内容
+    content = '<@{0}> **{0} 打包成功**\n'.format(user, job_num)  # 消息内容
 
     for f in apk_list:
         apk_url = job_url + f  # apk url
 
         # 构造一个消息
-        content += apk_url + '\n'
+        content += '[{0}]({0}) \n'.format(apk_url)
 
     user = [user]
 
