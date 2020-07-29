@@ -99,7 +99,7 @@ def send_markdown(content):
     msg = {
         'msgtype': 'markdown',
         'markdown': {
-            content: content
+            'content': content
         }
     }
     send_msg(msg)
