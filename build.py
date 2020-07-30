@@ -5,6 +5,8 @@ import os
 import sys
 import shutil
 import requests
+import hashlib
+import base64
 
 # ====================================== robot ===================================
 '''
@@ -95,6 +97,30 @@ def send_text_msg(content, mentioned_list=None):
     send_msg(msg)
 
 
+def send_img_msg(path):
+    """
+    发送图片
+
+    :param path: image file path
+    :return:
+    """
+
+    with open(path, 'rb') as f:
+        b64_str = base64.b64encode(f.read()).decode('utf-8')
+
+    with open(path, 'rb') as f:
+        md5 = hashlib.md5(f.read()).hexdigest()
+
+    msg = {
+        'msgtype': 'image',
+        'image': {
+            'base64': b64_str,
+            'md5': md5
+        }
+    }
+    send_msg(msg)
+
+
 def send_markdown(content):
     msg = {
         'msgtype': 'markdown',
@@ -121,17 +147,20 @@ def send_news_msg(content):
     send_msg(msg)
 
 
-def send_msg(msg):
+def send_msg(msg, headers=None):
     """
     发送消息
 
+    :param headers:
     :param msg:
     :return:
     """
-    headers = {
-        'user-agent': 'jenkins'
-    }
+    if not headers:
+        headers = {
+            'user-agent': 'jenkins'
+        }
     r = requests.post(__hook_url, json=msg, headers=headers)
+    print(r.headers)
     if r.status_code == 200:
         print('消息发送成功')
     else:
@@ -272,5 +301,10 @@ def send_qr_code_msg(apk_list):
     send_news_msg(articles)
 
 
+def test_send_img():
+    send_img_msg('apks/app-debug.png')
+
+
 if __name__ == '__main__':
-    build(sys.argv)
+    # build(sys.argv)
+    test_send_img()
